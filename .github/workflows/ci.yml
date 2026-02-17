@@ -24,7 +24,8 @@ jobs:
           pip install pytest
 
       - name: Unit tests
-        run: pytest -q
+        run: |
+          python -m pytest -q
 
       - name: Quality gate (offline mock)
         run: |
@@ -64,14 +65,17 @@ jobs:
           pip install -e .
           pip install pytest
 
-      # Only run if required secrets are present
       - name: Quality gate (Azure OpenAI / Foundry)
-        if: ${{ secrets.AZURE_OPENAI_API_KEY != '' && secrets.AZURE_OPENAI_BASE_URL != '' && secrets.AZURE_OPENAI_MODEL != '' }}
         env:
           AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
           AZURE_OPENAI_BASE_URL: ${{ secrets.AZURE_OPENAI_BASE_URL }}
           AZURE_OPENAI_MODEL: ${{ secrets.AZURE_OPENAI_MODEL }}
         run: |
+          if [ -z "${AZURE_OPENAI_API_KEY}" ] || [ -z "${AZURE_OPENAI_BASE_URL}" ] || [ -z "${AZURE_OPENAI_MODEL}" ]; then
+            echo "Azure secrets not configured; skipping azure-real-gate."
+            exit 0
+          fi
+
           eval-harness run \
             --dataset datasets/sample_tasks.jsonl \
             --prompt prompts/task_extraction/v1.md \
