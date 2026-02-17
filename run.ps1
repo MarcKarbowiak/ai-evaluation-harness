@@ -3,8 +3,8 @@ param(
   [string]$Adapter = "mock",
 
   [string]$Dataset = "datasets\sample_tasks.jsonl",
-  [string]$Prompt  = "prompts\task_extraction\v1.md",
-  [string]$Schema  = "schemas\task_extraction.schema.json",
+  [string]$PromptPath  = "prompts\task_extraction\v1.md",
+  [string]$SchemaPath  = "schemas\task_extraction.schema.json",
 
   # Quality gates (optional)
   [Nullable[double]]$MinSchemaValidRate = 1.0,
@@ -42,8 +42,8 @@ pip install -e . | Out-Host
 $argsList = @(
   "-m", "eval_harness.cli", "run",
   "--dataset", $Dataset,
-  "--prompt",  $Prompt,
-  "--schema",  $Schema,
+  "--prompt",  $PromptPath,
+  "--schema",  $SchemaPath,
   "--adapter", $Adapter,
   "--out",     "reports"
 )
@@ -69,5 +69,20 @@ if ($WriteBaseline) {
   $argsList += @("--write-baseline", $Baseline)
 }
 
+Write-Host "Dataset: $Dataset"
+Write-Host "Prompt:  $PromptPath"
+Write-Host "Schema:  $SchemaPath"
+Write-Host "Adapter: $Adapter"
+Write-Host "Baseline:$Baseline"
+
+if (!(Test-Path $Dataset)) { throw "Dataset not found: $Dataset" }
+if (!(Test-Path $PromptPath)) { throw "Prompt not found: $PromptPath" }
+if (!(Test-Path $SchemaPath)) { throw "Schema not found: $SchemaPath" }
+
 Write-Host "Running eval harness..." -ForegroundColor Cyan
-python @argsList
+& python @argsList
+
+if ($WriteBaseline -and !(Test-Path $Baseline)) {
+  Write-Host "ERROR: Baseline was NOT created at: $Baseline" -ForegroundColor Red
+  exit 1
+}
