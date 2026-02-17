@@ -1,0 +1,2 @@
+{"id":"case-001","input":{"text":"Please send an email and follow up."},"expected":{"tasks":[{"title":"Send email","assignee":"unknown","due_date":null,"confidence":0.6},{"title":"Follow up","assignee":"unknown","due_date":null,"confidence":0.55}]}}
+{"id":"case-002","input":{"text":"Just an update."},"expected":{"tasks":[]}}

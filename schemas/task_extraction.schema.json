@@ -1,0 +1,19 @@
+{
+  "type": "object",
+  "required": ["tasks"],
+  "properties": {
+    "tasks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["title","assignee","due_date","confidence"],
+        "properties": {
+          "title": {"type":"string"},
+          "assignee": {"type":"string"},
+          "due_date": {"type":["string","null"]},
+          "confidence": {"type":"number"}
+        }
+      }
+    }
+  }
+}

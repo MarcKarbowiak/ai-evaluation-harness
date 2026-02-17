@@ -1,0 +1,10 @@
+[project]
+name = "ai-evaluation-harness"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+  "jsonschema>=4.22.0"
+]
+
+[project.scripts]
+eval-harness = "eval_harness.cli:main"

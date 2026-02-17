@@ -1,31 +1,20 @@
 # AI Evaluation Harness (Minimal, Production-Minded)
 
-A lightweight evaluation harness for LLM features that produce **structured outputs** (JSON).
-Designed for:
-- regression testing prompts + models
-- schema validation
-- deterministic scoring where possible
-- repeatable runs with traceability (latency, token/cost placeholders)
+A lightweight evaluation harness for LLM features that produce structured outputs (JSON).
+Designed for regression testing, schema validation, deterministic scoring, and CI integration.
 
-This repo intentionally avoids being “framework-heavy”.
-It’s meant to be embedded into product repos or used as a standalone quality gate.
-
----
-
-## What this supports (v1)
-- Prompt versioning (simple registry)
+## Features
+- Prompt versioning
 - JSON Schema validation
-- Exact-match / key-level metrics for structured outputs
-- Run reports (JSON) + run metadata
-- Offline-friendly by default (MockModel adapter)
-- CI-ready
-
----
+- Structured output scoring (exact match + F1 on task titles)
+- Offline mock adapter (CI friendly)
+- JSON run reports
 
 ## Quickstart
 
-### 1) Setup
 ```bash
-make venv
+python -m venv .venv
 source .venv/bin/activate
-make install
+pip install -e .
+eval-harness run --dataset datasets/sample_tasks.jsonl   --prompt prompts/task_extraction/v1.md   --schema schemas/task_extraction.schema.json   --adapter mock
+```
