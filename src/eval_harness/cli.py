@@ -161,3 +161,6 @@ def main() -> None:
             for f in failures:
                 print(f" - {f}")
             sys.exit(2)
+
+if __name__ == "__main__":
+    main()

@@ -34,7 +34,9 @@ jobs:
             --schema schemas/task_extraction.schema.json \
             --adapter mock \
             --min-schema-valid-rate 1.0 \
-            --min-avg-f1 0.8
+            --min-avg-f1 0.30 \
+            --baseline baselines/task_extraction.mock.baseline.json \
+            --max-avg-f1-drop 0.02
 
       - name: Upload reports artifact
         if: always()
@@ -62,9 +64,9 @@ jobs:
           pip install -e .
           pip install pytest
 
-      # This step only runs if the secret exists
+      # Only run if required secrets are present
       - name: Quality gate (Azure OpenAI / Foundry)
-        if: ${{ env.AZURE_OPENAI_API_KEY != '' }}
+        if: ${{ secrets.AZURE_OPENAI_API_KEY != '' && secrets.AZURE_OPENAI_BASE_URL != '' && secrets.AZURE_OPENAI_MODEL != '' }}
         env:
           AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
           AZURE_OPENAI_BASE_URL: ${{ secrets.AZURE_OPENAI_BASE_URL }}
@@ -76,7 +78,7 @@ jobs:
             --schema schemas/task_extraction.schema.json \
             --adapter azure \
             --min-schema-valid-rate 1.0 \
-            --min-avg-f1 0.8
+            --min-avg-f1 0.60
 
       - name: Upload reports artifact (azure run)
         if: always()

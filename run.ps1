@@ -82,6 +82,8 @@ if (!(Test-Path $SchemaPath)) { throw "Schema not found: $SchemaPath" }
 Write-Host "Running eval harness..." -ForegroundColor Cyan
 & python @argsList
 
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
 if ($WriteBaseline -and !(Test-Path $Baseline)) {
   Write-Host "ERROR: Baseline was NOT created at: $Baseline" -ForegroundColor Red
   exit 1
