@@ -1,5 +1,8 @@
 # AI Evaluation Harness (Minimal, Production-Minded)
 
+[![CI](https://github.com/marckarbowiak/ai-evaluation-harness/actions/workflows/ci.yml/badge.svg)](https://github.com/marckarbowiak/ai-evaluation-harness/actions/workflows/ci.yml)
+![Python](https://img.shields.io/badge/python-3.11-blue)
+
 A lightweight evaluation harness for LLM features that produce structured outputs (JSON).
 Designed for regression testing, schema validation, deterministic scoring, and CI integration.
 
