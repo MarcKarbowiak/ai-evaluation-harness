@@ -7,6 +7,7 @@ on:
 jobs:
   test-and-mock-gate:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -23,8 +24,7 @@ jobs:
           pip install pytest
 
       - name: Unit tests
-        run: |
-          pytest -q
+        run: pytest -q
 
       - name: Quality gate (offline mock)
         run: |
@@ -44,10 +44,9 @@ jobs:
           path: reports
 
   azure-real-gate:
-    # Only run if secrets exist in this repo (fork PRs won't have them)
-    if: ${{ secrets.AZURE_OPENAI_API_KEY != '' && secrets.AZURE_OPENAI_BASE_URL != '' && secrets.AZURE_OPENAI_MODEL != '' }}
     runs-on: ubuntu-latest
     needs: test-and-mock-gate
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -63,8 +62,9 @@ jobs:
           pip install -e .
           pip install pytest
 
-      # Real gate using Azure OpenAI / Foundry OpenAI-compatible v1 endpoint
+      # This step only runs if the secret exists
       - name: Quality gate (Azure OpenAI / Foundry)
+        if: ${{ env.AZURE_OPENAI_API_KEY != '' }}
         env:
           AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
           AZURE_OPENAI_BASE_URL: ${{ secrets.AZURE_OPENAI_BASE_URL }}
