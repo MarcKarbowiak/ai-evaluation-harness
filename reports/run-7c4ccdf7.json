@@ -1,0 +1,167 @@
+{
+  "meta": {
+    "run_id": "run-7c4ccdf7",
+    "started_at_utc": "2026-02-17T21:28:14.256728+00:00",
+    "adapter": "mock",
+    "dataset_path": "datasets/sample_tasks.jsonl",
+    "prompt_path": "prompts/task_extraction/v1.md",
+    "schema_path": "schemas/task_extraction.schema.json"
+  },
+  "summary": {
+    "run_id": "run-7c4ccdf7",
+    "started_at_utc": "2026-02-17T21:28:14.256728+00:00",
+    "adapter": "mock",
+    "total": 12,
+    "schema_valid_rate": 1.0,
+    "exact_match_rate": 0.16666666666666666,
+    "avg_f1": 0.3611111111111111,
+    "avg_latency_ms": 0.0,
+    "parse_error_count": 0
+  },
+  "results": [
+    {
+      "id": "case-001",
+      "schema_valid": true,
+      "schema_errors": [],
+      "exact_match": false,
+      "f1": 0.0,
+      "latency_ms": 0,
+      "usage": {
+        "mock_tokens": 22
+      },
+      "cost_usd": 0.0
+    },
+    {
+      "id": "case-002",
+      "schema_valid": true,
+      "schema_errors": [],
+      "exact_match": false,
+      "f1": 0.6666666666666666,
+      "latency_ms": 0,
+      "usage": {
+        "mock_tokens": 12
+      },
+      "cost_usd": 0.0
+    },
+    {
+      "id": "case-003",
+      "schema_valid": true,
+      "schema_errors": [],
+      "exact_match": false,
+      "f1": 0.0,
+      "latency_ms": 0,
+      "usage": {
+        "mock_tokens": 16
+      },
+      "cost_usd": 0.0
+    },
+    {
+      "id": "case-004",
+      "schema_valid": true,
+      "schema_errors": [],
+      "exact_match": false,
+      "f1": 0.6666666666666666,
+      "latency_ms": 0,
+      "usage": {
+        "mock_tokens": 14
+      },
+      "cost_usd": 0.0
+    },
+    {
+      "id": "case-005",
+      "schema_valid": true,
+      "schema_errors": [],
+      "exact_match": true,
+      "f1": 1.0,
+      "latency_ms": 0,
+      "usage": {
+        "mock_tokens": 11
+      },
+      "cost_usd": 0.0
+    },
+    {
+      "id": "case-006",
+      "schema_valid": true,
+      "schema_errors": [],
+      "exact_match": false,
+      "f1": 0.0,
+      "latency_ms": 0,
+      "usage": {
+        "mock_tokens": 10
+      },
+      "cost_usd": 0.0
+    },
+    {
+      "id": "case-007",
+      "schema_valid": true,
+      "schema_errors": [],
+      "exact_match": false,
+      "f1": 0.0,
+      "latency_ms": 0,
+      "usage": {
+        "mock_tokens": 23
+      },
+      "cost_usd": 0.0
+    },
+    {
+      "id": "case-008",
+      "schema_valid": true,
+      "schema_errors": [],
+      "exact_match": false,
+      "f1": 0.0,
+      "latency_ms": 0,
+      "usage": {
+        "mock_tokens": 11
+      },
+      "cost_usd": 0.0
+    },
+    {
+      "id": "case-009",
+      "schema_valid": true,
+      "schema_errors": [],
+      "exact_match": false,
+      "f1": 0.0,
+      "latency_ms": 0,
+      "usage": {
+        "mock_tokens": 16
+      },
+      "cost_usd": 0.0
+    },
+    {
+      "id": "case-010",
+      "schema_valid": true,
+      "schema_errors": [],
+      "exact_match": false,
+      "f1": 0.6666666666666666,
+      "latency_ms": 0,
+      "usage": {
+        "mock_tokens": 9
+      },
+      "cost_usd": 0.0
+    },
+    {
+      "id": "case-011",
+      "schema_valid": true,
+      "schema_errors": [],
+      "exact_match": true,
+      "f1": 1.0,
+      "latency_ms": 0,
+      "usage": {
+        "mock_tokens": 16
+      },
+      "cost_usd": 0.0
+    },
+    {
+      "id": "case-012",
+      "schema_valid": true,
+      "schema_errors": [],
+      "exact_match": false,
+      "f1": 0.3333333333333333,
+      "latency_ms": 0,
+      "usage": {
+        "mock_tokens": 24
+      },
+      "cost_usd": 0.0
+    }
+  ]
+}

@@ -1,61 +1,66 @@
-# AI Evaluation Harness (Minimal, Production-Minded)
+# AI Evaluation Harness (Production‑Minded, Minimal)
 
 [![CI](https://github.com/marckarbowiak/ai-evaluation-harness/actions/workflows/ci.yml/badge.svg)](https://github.com/marckarbowiak/ai-evaluation-harness/actions/workflows/ci.yml)
 
-A lightweight evaluation harness for LLM features that produce **structured outputs (JSON)**.
+A lightweight evaluation harness for LLM features that produce **structured JSON outputs**.
 
-It provides **schema validation**, **regression scoring**, **quality gates**, and **baseline regression checks** so you can treat AI features like production software: measurable, repeatable, and safe to ship.
+It provides:
+
+- Schema validation
+- Regression scoring (Exact Match + F1)
+- Deterministic mock adapter for CI
+- OpenAI / Azure OpenAI support
+- Quality gates (threshold-based failure)
+- Baseline regression protection
+
+The goal is simple: **treat AI features like production software** — measurable, testable, and safe to evolve.
 
 ---
 
-## What this harness is for
+## Why This Exists
 
-AI-powered features (extraction, classification, summarization-to-JSON, etc.) regress easily when:
+LLM-powered features regress easily when:
 
 - prompts change
 - models are upgraded
-- temperature / decoding settings change
-- RAG/retrieval or chunking changes
+- decoding parameters change
 - schemas evolve
+- retrieval / RAG logic changes
 
-This harness helps you detect regressions early by running a consistent dataset through a prompt+model and measuring:
+This harness ensures changes are:
 
-- **Schema validity** (output must conform to JSON schema)
-- **Correctness metrics** (e.g., exact match / F1)
-- **Run metadata** (latency, usage/cost placeholders)
-- **Baseline regression** (compare against “known good” results)
-
----
-
-## Features
-
-### Core
-- **Dataset-driven evaluation** (`datasets/*.jsonl`)
-- **Prompt versioning** (`prompts/<capability>/vN.md`)
-- **JSON Schema enforcement** (`schemas/*.schema.json`)
-- **Metrics** (exact match + F1 on extracted task titles)
-- **Run reports** written to `reports/` (JSON)
-
-### Quality gates
-- Fail the run (exit code 2) if metrics drop below thresholds:
-  - `--min-schema-valid-rate`
-  - `--min-exact-match-rate`
-  - `--min-avg-f1`
-
-### Baseline regression checks
-- Compare current run metrics against a committed baseline:
-  - `--baseline baselines/...json`
-  - `--max-avg-f1-drop` (and similar options)
-
-### Model adapters
-- `mock` adapter: deterministic, offline, CI-safe
-- `openai` / `azure` adapters (OpenAI-compatible v1): realistic runs against OpenAI or Azure OpenAI / Azure AI Foundry endpoints
+- measurable
+- reproducible
+- enforceable in CI
 
 ---
 
-## Repository layout
+# Architecture Overview
 
-```text
+```mermaid
+flowchart LR
+  D["Dataset (JSONL)"] --> R["Runner"]
+  P["Prompt (vN)"] --> R
+  R --> A["Adapter\nmock | openai | azure"]
+  A --> O["Structured Output (JSON)"]
+
+  S["JSON Schema"] --> V["Schema Validation"]
+  O --> V
+
+  O --> M["Scoring\nExact Match + F1"]
+  V --> M
+
+  B["Baseline"] --> G["Regression Gates"]
+  M --> G
+
+  G --> RPT["Report (JSON)"]
+```
+
+---
+
+# Repository Structure
+
+```
 ai-evaluation-harness/
   .github/workflows/ci.yml
   baselines/
@@ -66,233 +71,279 @@ ai-evaluation-harness/
   src/eval_harness/
   tests/
   run.ps1
+  test.ps1
 ```
 
 ---
 
-flowchart LR
-  D["Dataset<br/>(JSONL)"] --> R["Runner"]
-  P["Prompt<br/>(vN)"] --> R
-  R --> A["Adapter<br/>mock/openai/azure"]
-  A --> O["Output<br/>(JSON)"]
+# Quickstart (Windows / PowerShell)
 
-  S["JSON Schema"] --> V["Schema Validation"]
-  O --> V
+This repository includes helper scripts to ensure a consistent local setup.
 
-  O --> M["Scoring<br/>Exact match + F1"]
-  V --> M
+## Run the harness (mock adapter)
 
-  B["Baseline"] --> G["Regression Gates"]
-  M --> G
-
-  G --> RPT["Report<br/>(JSON)"]
-
----
-
-## Quickstart (Windows / PowerShell)
-
-This repo includes a PowerShell wrapper (`run.ps1`) that:
-- ensures a local venv exists (`.venv`)
-- activates it
-- installs the package in editable mode
-- runs the harness with quality gates
-- optionally enforces baseline regression checks
-
-### Run (mock adapter, CI-safe)
 From repo root:
 
 ```powershell
 .\run.ps1
 ```
 
-This uses:
-- `Adapter = mock`
-- default sample dataset/prompt/schema
-- quality gates (schema validity + avg F1)
+This will:
+
+- Create `.venv` if missing
+- Activate it
+- Install dependencies
+- Run the evaluation harness
 
 ---
 
-## `run.ps1` options (all supported parameters)
-
-You can override inputs, gates, baseline, and adapter.
-
-### Parameters
+# run.ps1 Options
 
 | Parameter | Default | Description |
-|---|---:|---|
-| `-Adapter` | `mock` | `mock`, `openai`, or `azure` |
+|------------|----------|-------------|
+| `-Adapter` | `mock` | `mock`, `openai`, `azure` |
 | `-Dataset` | `datasets\sample_tasks.jsonl` | JSONL evaluation dataset |
-| `-Prompt` | `prompts\task_extraction\v1.md` | Prompt file used for evaluation |
-| `-Schema` | `schemas\task_extraction.schema.json` | JSON schema enforced on outputs |
-| `-MinSchemaValidRate` | `1.0` | Fail if schema-valid rate below this |
-| `-MinAvgF1` | `0.8` | Fail if average F1 below this |
-| `-Baseline` | `baselines\task_extraction.mock.baseline.json` | Baseline summary/report to compare against |
-| `-MaxAvgF1Drop` | `0.02` | Allowed regression vs baseline (absolute delta) |
-| `-WriteBaseline` | (switch) | Writes current summary to baseline path |
-
-> Notes
-> - If the baseline file **does not exist** and `-WriteBaseline` is not set, `run.ps1` will **skip** baseline regression checks.
-> - Baselines are **never** updated automatically; baseline updates are explicit via `-WriteBaseline`.
+| `-Prompt` | `prompts\task_extraction\v1.md` | Prompt file |
+| `-Schema` | `schemas\task_extraction.schema.json` | JSON schema file |
+| `-MinSchemaValidRate` | `1.0` | Fail if below threshold |
+| `-MinAvgF1` | `0.8` | Fail if below threshold |
+| `-Baseline` | `baselines\task_extraction.mock.baseline.json` | Baseline reference |
+| `-MaxAvgF1Drop` | `0.02` | Allowed regression delta |
+| `-WriteBaseline` | switch | Write current summary as baseline |
 
 ---
 
-## Example commands
+# Baselines
 
-### 1) Run with defaults
+## What is a baseline?
 
-```powershell
-.\run.ps1
-```
+A baseline is a **committed reference summary** representing known-good evaluation performance.
 
-### 2) Run with stricter gates
+It prevents silent degradation.
 
-```powershell
-.\run.ps1 -MinAvgF1 0.9 -MinSchemaValidRate 1.0
-```
+Example:
 
-### 3) Use a different dataset/prompt/schema
+If baseline avg F1 = 0.92
 
-```powershell
-.\run.ps1 `
-  -Dataset "datasets\my_cases.jsonl" `
-  -Prompt  "prompts\task_extraction\v2.md" `
-  -Schema  "schemas\task_extraction.schema.json"
-```
+And a change drops it to 0.83
 
-### 4) Create or update the baseline (explicit)
+Even if minimum threshold is 0.80 — this is still a regression.
+
+Baseline regression catches this.
+
+---
+
+## Creating or Updating the Baseline
+
+Explicitly run:
 
 ```powershell
 .\run.ps1 -WriteBaseline
 ```
 
-This writes a summary JSON to:
+This writes:
 
-- `baselines\task_extraction.mock.baseline.json`
-
-Commit that file to version-control the expected performance.
-
-### 5) Run with baseline regression checks (prevent degradation)
-
-If the baseline exists, this will fail if the current average F1 drops by more than the allowed delta.
-
-```powershell
-.\run.ps1 -Baseline "baselines\task_extraction.mock.baseline.json" -MaxAvgF1Drop 0.02
+```
+baselines/task_extraction.mock.baseline.json
 ```
 
-### 6) Run against Azure OpenAI / Foundry (real model)
+Commit it.
 
-Set env vars, then run:
+Baselines are **never updated automatically**.
 
-```powershell
-$env:AZURE_OPENAI_API_KEY="..."
-$env:AZURE_OPENAI_BASE_URL="https://YOUR-RESOURCE.openai.azure.com/openai/v1/"
-$env:AZURE_OPENAI_MODEL="YOUR_MODEL_OR_DEPLOYMENT"
+---
 
-.\run.ps1 -Adapter azure
+## When to Update the Baseline
+
+Update only when:
+
+- Prompt improvements intentionally change output
+- Model upgrades are accepted
+- Dataset changes are deliberate
+
+Do NOT update baseline to “make CI green.”
+
+Treat baseline updates like snapshot test updates — deliberate and reviewed.
+
+---
+
+# Python Virtual Environment (.venv)
+
+## What is it?
+
+A Python virtual environment is an **isolated Python runtime per project**.
+
+It ensures:
+
+- No global dependency pollution
+- Reproducible installs
+- Alignment with CI
+
+The environment lives in:
+
+```
+.venv/
 ```
 
-### 7) Run against OpenAI public endpoint (real model)
+It is not committed to Git.
+
+---
+
+## Activating manually
 
 ```powershell
-$env:OPENAI_API_KEY="..."
-$env:OPENAI_MODEL="gpt-4.1-mini"  # example
-# optional:
-# $env:OPENAI_BASE_URL="https://api.openai.com/v1"
+.\.venv\Scripts\Activate.ps1
+```
 
-.\run.ps1 -Adapter openai
+Deactivate:
+
+```powershell
+deactivate
 ```
 
 ---
 
-## Baselines: what they are and why they matter
+## Optional PowerShell helpers
 
-### What is a baseline?
-A baseline is a **version-controlled “known good” reference** for the evaluation summary (or a full report).
+Add to your `$PROFILE`:
 
-It represents:
-- acceptable output quality
-- measured on a fixed dataset
-- for a specific capability (e.g., task extraction)
+```powershell
+function venv {
+    if (!(Test-Path ".\pyproject.toml")) {
+        Write-Host "Not repo root" -ForegroundColor Yellow
+        return
+    }
+    if (!(Test-Path ".\.venv\Scripts\Activate.ps1")) {
+        python -m venv .venv
+    }
+    . .\.venv\Scripts\Activate.ps1
+}
 
-### Why use baselines?
-Quality gates (`--min-avg-f1`, etc.) ensure you meet a minimum bar.
+function devenv {
+    if (Get-Command deactivate -ErrorAction SilentlyContinue) {
+        deactivate
+    }
+}
+```
 
-Baselines ensure you **don’t silently degrade** over time even if you remain above the minimum bar.
+Usage:
 
-Example:
-- Minimum avg F1 is 0.80
-- Baseline avg F1 is 0.92
-
-A change that drops you to 0.83 technically passes the minimum gate, but it’s a regression.
-
-Baseline regression checks catch this.
-
-### How baseline regression prevents degradation
-When you run with:
-
-- `--baseline baselines/...json`
-- `--max-avg-f1-drop 0.02`
-
-the harness will fail if:
-
-`current_avg_f1 < baseline_avg_f1 - 0.02`
-
-This keeps quality from drifting down slowly.
+```powershell
+cd ai-evaluation-harness
+venv
+```
 
 ---
 
-## When to update the baseline (important)
+## Do I need to activate manually?
 
-Update the baseline **only** when you intentionally accept a new quality level.
+No.
 
-### Good reasons to update baseline
-- You improved a prompt and quality measurably improved
-- You expanded the schema and updated expected outputs accordingly
-- You changed the dataset intentionally (new edge cases) and the new baseline reflects the expanded coverage
-- You switched models intentionally and want to treat the new behavior as the standard
+Both `run.ps1` and `test.ps1` automatically create and activate `.venv`.
 
-### Bad reasons to update baseline
-- “The build is failing and I want it green”
-- “Quality got worse but it’s still above the minimum”
-
-Baseline updates should be treated like test snapshot updates:
-- deliberate
-- reviewed
-- justified in the PR description
+Manual activation is only needed for interactive debugging.
 
 ---
 
-## Recommended baseline workflow
+# Testing
 
-1. **Add/adjust dataset cases** (especially edge cases)
-2. Run locally with real adapter (optional) and mock adapter (required)
-3. If changes are intended and acceptable:
-   - run `-WriteBaseline`
-   - commit baseline changes
-4. Keep CI enforcing:
-   - minimum gates
-   - baseline regression tolerances
+Run tests via:
 
----
+```powershell
+.\test.ps1
+```
 
-## CI behavior
+This ensures:
 
-- CI always runs:
-  - unit tests
-  - mock adapter quality gate
-  - uploads `reports/` as artifacts
-
-- The Azure “real gate” job runs only if required secrets are configured in the repo.
+- `.venv` exists
+- pytest is installed
+- tests run via `python -m pytest`
 
 ---
 
-## Notes on extending this harness
+# CI Behavior
 
-Common next steps (kept intentionally out of v1):
-- per-tag thresholds (happy-path vs edge-case)
-- baseline diff report (per-case regressions)
-- cost caps (max tokens / max cost per run)
-- multi-prompt comparisons (A/B)
+CI runs:
 
-If you add those, keep the same philosophy: small, auditable, and easy to embed into product repos.
+- Unit tests
+- Mock adapter quality gate
+- Baseline regression check (if baseline committed)
+- Optional Azure gate if secrets are configured
+
+Reports are uploaded as artifacts.
+
+---
+
+# Example Report Output
+
+Below is a simplified example of a generated report file (`reports/run-abc123.json`):
+
+```json
+{
+  "summary": {
+    "total": 12,
+    "schema_valid_rate": 1.0,
+    "exact_match_rate": 0.42,
+    "avg_f1": 0.78,
+    "avg_latency_ms": 12.4,
+    "total_cost_usd": 0.00
+  },
+  "cases": [
+    {
+      "id": "case-001",
+      "schema_valid": true,
+      "exact_match": false,
+      "f1": 0.83,
+      "latency_ms": 9,
+      "cost_usd": 0.0
+    },
+    {
+      "id": "case-002",
+      "schema_valid": true,
+      "exact_match": true,
+      "f1": 1.0,
+      "latency_ms": 8,
+      "cost_usd": 0.0
+    }
+  ]
+}
+```
+
+The `summary` section is what quality gates and baseline regression checks compare against.
+
+- `schema_valid_rate` ensures structured output correctness.
+- `exact_match_rate` is strict equality vs expected output.
+- `avg_f1` allows partial credit scoring.
+- `avg_latency_ms` enables performance tracking.
+- `total_cost_usd` enables future cost gating.
+
+These metrics make LLM behavior measurable and enforceable in CI.
+
+---
+
+# Extending This Harness
+
+Recommended next steps (intentionally not over-engineered):
+
+- Per-tag thresholds (edge-case vs happy-path)
+- Cost tracking gates
+- Prompt A/B comparison
+- Per-case regression diff reporting
+
+Keep it small, measurable, and production-aligned.
+
+---
+
+# Philosophy
+
+This harness favors:
+
+- Determinism in CI
+- Explicit baselines
+- Controlled regression
+- Clear failure modes
+
+AI systems drift.
+
+Production systems measure that drift.
 
