@@ -1,0 +1,47 @@
+{
+  "meta": {
+    "run_id": "run-a81ec9eb",
+    "started_at_utc": "2026-02-17T19:38:37.796045+00:00",
+    "adapter": "mock",
+    "dataset_path": "datasets/sample_tasks.jsonl",
+    "prompt_path": "prompts/task_extraction/v1.md",
+    "schema_path": "schemas/task_extraction.schema.json"
+  },
+  "summary": {
+    "run_id": "run-a81ec9eb",
+    "started_at_utc": "2026-02-17T19:38:37.796045+00:00",
+    "adapter": "mock",
+    "total": 2,
+    "schema_valid_rate": 1.0,
+    "exact_match_rate": 1.0,
+    "avg_f1": 1.0,
+    "avg_latency_ms": 0.0,
+    "parse_error_count": 0
+  },
+  "results": [
+    {
+      "id": "case-001",
+      "schema_valid": true,
+      "schema_errors": [],
+      "exact_match": true,
+      "f1": 1.0,
+      "latency_ms": 0,
+      "usage": {
+        "mock_tokens": 7
+      },
+      "cost_usd": 0.0
+    },
+    {
+      "id": "case-002",
+      "schema_valid": true,
+      "schema_errors": [],
+      "exact_match": true,
+      "f1": 1.0,
+      "latency_ms": 0,
+      "usage": {
+        "mock_tokens": 3
+      },
+      "cost_usd": 0.0
+    }
+  ]
+}
