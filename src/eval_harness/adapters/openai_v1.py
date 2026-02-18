@@ -7,6 +7,7 @@ from typing import Any, Dict, Optional
 from openai import OpenAI
 
 from .base import ModelResult
+from .usage import normalize_usage
 
 
 class OpenAIV1Model:
@@ -60,17 +61,12 @@ class OpenAIV1Model:
         latency_ms = int((time.time() - start) * 1000)
 
         # Usage/cost fields vary by provider; keep placeholders
-        usage = getattr(resp, "usage", None)
-        usage_dict = (
-            usage.model_dump()
-            if hasattr(usage, "model_dump")
-            else (usage if isinstance(usage, dict) else None)
-        )
+        usage = normalize_usage(getattr(resp, "usage", None))
 
         return ModelResult(
             output=parsed,
             raw_text=out_text,
             latency_ms=latency_ms,
-            usage=usage_dict,
+            usage=usage,
             cost_usd=None,
         )

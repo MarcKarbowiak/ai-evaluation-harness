@@ -5,7 +5,6 @@ import os
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
 
 from eval_harness.adapters.base import ModelAdapter
 from eval_harness.adapters.mock import MockModel
@@ -51,27 +50,6 @@ def _build_adapter(adapter_name: str) -> ModelAdapter:
         return OpenAIV1Model(api_key=api_key, model=model, base_url=base_url)
 
     raise ValueError(f"Unknown adapter: {adapter_name}. Expected one of: mock, openai, azure")
-
-
-def _jsonable_usage(usage: Any) -> Any:
-    """
-    Normalize usage objects (some SDKs return Pydantic models or custom objects).
-    """
-    if usage is None:
-        return None
-    if isinstance(usage, (dict, list, str, int, float, bool)):
-        return usage
-    if hasattr(usage, "model_dump"):
-        try:
-            return usage.model_dump()
-        except Exception:
-            pass
-    if hasattr(usage, "__dict__"):
-        try:
-            return dict(usage.__dict__)
-        except Exception:
-            pass
-    return str(usage)
 
 
 def run_eval(
@@ -122,7 +100,7 @@ def run_eval(
                 "exact_match": em,
                 "f1": f1,
                 "latency_ms": model_result.latency_ms,
-                "usage": _jsonable_usage(getattr(model_result, "usage", None)),
+                "usage": model_result.usage,
                 "cost_usd": getattr(model_result, "cost_usd", None),
             }
         )
