@@ -29,7 +29,9 @@ class OpenAIV1Model:
         # base_url optional:
         # - OpenAI: omit base_url (or use https://api.openai.com/v1)
         # - Azure/Foundry: set base_url to .../openai/v1/  (see README below)
-        self.client = OpenAI(api_key=api_key, base_url=base_url) if base_url else OpenAI(api_key=api_key)
+        self.client = (
+            OpenAI(api_key=api_key, base_url=base_url) if base_url else OpenAI(api_key=api_key)
+        )
         self.model = model
 
     def generate_structured(self, *, prompt: str, input_obj: Dict[str, Any]) -> ModelResult:
@@ -59,7 +61,11 @@ class OpenAIV1Model:
 
         # Usage/cost fields vary by provider; keep placeholders
         usage = getattr(resp, "usage", None)
-        usage_dict = usage.model_dump() if hasattr(usage, "model_dump") else (usage if isinstance(usage, dict) else None)
+        usage_dict = (
+            usage.model_dump()
+            if hasattr(usage, "model_dump")
+            else (usage if isinstance(usage, dict) else None)
+        )
 
         return ModelResult(
             output=parsed,

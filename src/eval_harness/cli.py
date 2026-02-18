@@ -94,19 +94,52 @@ def main() -> None:
     run.add_argument("--out", default="reports", help="Output directory for reports")
 
     # Quality gates (absolute thresholds)
-    run.add_argument("--min-schema-valid-rate", type=float, default=None, help="Fail if schema_valid_rate below this (0..1).")
-    run.add_argument("--min-exact-match-rate", type=float, default=None, help="Fail if exact_match_rate below this (0..1).")
-    run.add_argument("--min-avg-f1", type=float, default=None, help="Fail if avg_f1 below this (0..1).")
-    run.add_argument("--fail-on-empty", action="store_true", help="Fail if dataset contains zero cases.")
+    run.add_argument(
+        "--min-schema-valid-rate",
+        type=float,
+        default=None,
+        help="Fail if schema_valid_rate below this (0..1).",
+    )
+    run.add_argument(
+        "--min-exact-match-rate",
+        type=float,
+        default=None,
+        help="Fail if exact_match_rate below this (0..1).",
+    )
+    run.add_argument(
+        "--min-avg-f1", type=float, default=None, help="Fail if avg_f1 below this (0..1)."
+    )
+    run.add_argument(
+        "--fail-on-empty", action="store_true", help="Fail if dataset contains zero cases."
+    )
 
     # Baseline regression gates
     run.add_argument("--baseline", default=None, help="Path to baseline JSON (report or summary).")
-    run.add_argument("--max-schema-valid-drop", type=float, default=None, help="Fail if schema_valid_rate drops vs baseline by more than this.")
-    run.add_argument("--max-exact-match-drop", type=float, default=None, help="Fail if exact_match_rate drops vs baseline by more than this.")
-    run.add_argument("--max-avg-f1-drop", type=float, default=None, help="Fail if avg_f1 drops vs baseline by more than this.")
+    run.add_argument(
+        "--max-schema-valid-drop",
+        type=float,
+        default=None,
+        help="Fail if schema_valid_rate drops vs baseline by more than this.",
+    )
+    run.add_argument(
+        "--max-exact-match-drop",
+        type=float,
+        default=None,
+        help="Fail if exact_match_rate drops vs baseline by more than this.",
+    )
+    run.add_argument(
+        "--max-avg-f1-drop",
+        type=float,
+        default=None,
+        help="Fail if avg_f1 drops vs baseline by more than this.",
+    )
 
     # Baseline writer (optional convenience)
-    run.add_argument("--write-baseline", default=None, help="Write current summary to this JSON path (summary-only).")
+    run.add_argument(
+        "--write-baseline",
+        default=None,
+        help="Write current summary to this JSON path (summary-only).",
+    )
 
     args = parser.parse_args()
 
@@ -135,8 +168,16 @@ def main() -> None:
         if args.fail_on_empty and int(summary.get("total", 0)) == 0:
             failures.append("dataset is empty (total=0)")
 
-        failures += _check_threshold("schema_valid_rate", float(summary.get("schema_valid_rate", 0.0)), args.min_schema_valid_rate)
-        failures += _check_threshold("exact_match_rate", float(summary.get("exact_match_rate", 0.0)), args.min_exact_match_rate)
+        failures += _check_threshold(
+            "schema_valid_rate",
+            float(summary.get("schema_valid_rate", 0.0)),
+            args.min_schema_valid_rate,
+        )
+        failures += _check_threshold(
+            "exact_match_rate",
+            float(summary.get("exact_match_rate", 0.0)),
+            args.min_exact_match_rate,
+        )
         failures += _check_threshold("avg_f1", float(summary.get("avg_f1", 0.0)), args.min_avg_f1)
 
         # Baseline regression gates (optional)
@@ -161,6 +202,7 @@ def main() -> None:
             for f in failures:
                 print(f" - {f}")
             sys.exit(2)
+
 
 if __name__ == "__main__":
     main()

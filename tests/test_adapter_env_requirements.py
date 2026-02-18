@@ -1,4 +1,3 @@
-import os
 import pytest
 
 from eval_harness.core.runner import run_eval
@@ -35,4 +34,8 @@ def test_azure_adapter_requires_env(monkeypatch, tmp_path):
             out_dir=str(tmp_path),
         )
     msg = str(ex.value)
-    assert "AZURE_OPENAI_API_KEY" in msg or "AZURE_OPENAI_MODEL" in msg or "AZURE_OPENAI_BASE_URL" in msg
+    assert (
+        "AZURE_OPENAI_API_KEY" in msg
+        or "AZURE_OPENAI_MODEL" in msg
+        or "AZURE_OPENAI_BASE_URL" in msg
+    )

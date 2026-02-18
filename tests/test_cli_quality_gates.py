@@ -1,4 +1,5 @@
 import sys
+
 import pytest
 
 from eval_harness.cli import main
@@ -9,13 +10,20 @@ def test_cli_quality_gate_fails(monkeypatch):
     argv = [
         "eval-harness",
         "run",
-        "--dataset", "datasets/sample_tasks.jsonl",
-        "--prompt", "prompts/task_extraction/v1.md",
-        "--schema", "schemas/task_extraction.schema.json",
-        "--adapter", "mock",
-        "--min-schema-valid-rate", "1.0",
-        "--min-avg-f1", "1.1",
-        "--out", "reports",
+        "--dataset",
+        "datasets/sample_tasks.jsonl",
+        "--prompt",
+        "prompts/task_extraction/v1.md",
+        "--schema",
+        "schemas/task_extraction.schema.json",
+        "--adapter",
+        "mock",
+        "--min-schema-valid-rate",
+        "1.0",
+        "--min-avg-f1",
+        "1.1",
+        "--out",
+        "reports",
     ]
     monkeypatch.setattr(sys, "argv", argv)
 
@@ -29,13 +37,20 @@ def test_cli_quality_gate_passes(monkeypatch, tmp_path):
     argv = [
         "eval-harness",
         "run",
-        "--dataset", "datasets/sample_tasks.jsonl",
-        "--prompt", "prompts/task_extraction/v1.md",
-        "--schema", "schemas/task_extraction.schema.json",
-        "--adapter", "mock",
-        "--min-schema-valid-rate", "1.0",
-        "--min-avg-f1", "0.0",
-        "--out", str(tmp_path),
+        "--dataset",
+        "datasets/sample_tasks.jsonl",
+        "--prompt",
+        "prompts/task_extraction/v1.md",
+        "--schema",
+        "schemas/task_extraction.schema.json",
+        "--adapter",
+        "mock",
+        "--min-schema-valid-rate",
+        "1.0",
+        "--min-avg-f1",
+        "0.0",
+        "--out",
+        str(tmp_path),
     ]
     monkeypatch.setattr(sys, "argv", argv)
 

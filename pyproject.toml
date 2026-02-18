@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "ai-evaluation-harness"
 version = "0.1.0"
@@ -6,6 +10,25 @@ dependencies = [
   "jsonschema>=4.22.0",
   "openai>=1.0.0"
 ]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8",
+  "ruff>=0.9",
+]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+src = ["src", "tests"]
+extend-exclude = ["reports", "datasets", "baselines", "src/ai_evaluation_harness.egg-info"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+ignore = ["E501"]
+
+[tool.ruff.format]
+line-ending = "lf"
 
 [project.scripts]
 eval-harness = "eval_harness.cli:main"

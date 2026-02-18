@@ -77,9 +77,18 @@ class MockModel:
 
         # Early exits for explicit non-task cues (keep deterministic and conservative)
         lowered = text.lower()
-        if any(phrase in lowered for phrase in ["no action items", "just brainstorming", "status update only"]):
+        if any(
+            phrase in lowered
+            for phrase in ["no action items", "just brainstorming", "status update only"]
+        ):
             latency_ms = int((time.time() - start) * 1000)
-            return ModelResult(output={"tasks": []}, raw_text=None, latency_ms=latency_ms, usage={"mock_tokens": len(lowered.split())}, cost_usd=0.0)
+            return ModelResult(
+                output={"tasks": []},
+                raw_text=None,
+                latency_ms=latency_ms,
+                usage={"mock_tokens": len(lowered.split())},
+                cost_usd=0.0,
+            )
 
         due_date = self._extract_due_date(text)
 
@@ -87,11 +96,15 @@ class MockModel:
 
         # 1) Extract assignee-scoped segments first (strong signal)
         for who, segment, strength in self._extract_assignee_segments(text):
-            tasks = self._extract_tasks_from_segment(segment, who=who, due_date=due_date, strength=strength)
+            tasks = self._extract_tasks_from_segment(
+                segment, who=who, due_date=due_date, strength=strength
+            )
             candidates.extend(tasks)
 
         # 2) Extract generic tasks from full text (weaker signal)
-        candidates.extend(self._extract_tasks_from_segment(text, who=None, due_date=due_date, strength="weak"))
+        candidates.extend(
+            self._extract_tasks_from_segment(text, who=None, due_date=due_date, strength="weak")
+        )
 
         # 3) Dedupe by normalized title
         deduped = self._dedupe_tasks(candidates)
@@ -144,7 +157,6 @@ class MockModel:
         strength: str,
     ) -> List[Dict[str, Any]]:
         seg = segment.strip()
-        seg_lower = seg.lower()
 
         tasks: List[Dict[str, Any]] = []
 
@@ -162,7 +174,9 @@ class MockModel:
             title = self._make_title(p, verb=verb)
             assignee = who if who else self._infer_assignee_fallback(seg)
 
-            conf = self._confidence_for(strength=strength, verb=verb, has_assignee=bool(assignee and assignee != "unknown"))
+            conf = self._confidence_for(
+                strength=strength, verb=verb, has_assignee=bool(assignee and assignee != "unknown")
+            )
 
             tasks.append(
                 {
@@ -205,7 +219,12 @@ class MockModel:
         s = raw.strip()
 
         # remove polite prefixes
-        s = re.sub(r"^\s*(please|can you|could you|let's|next steps:|action items:|action:)\s*", "", s, flags=re.IGNORECASE)
+        s = re.sub(
+            r"^\s*(please|can you|could you|let's|next steps:|action items:|action:)\s*",
+            "",
+            s,
+            flags=re.IGNORECASE,
+        )
 
         # normalize whitespace
         s = re.sub(r"\s+", " ", s).strip()
@@ -216,7 +235,12 @@ class MockModel:
             s = s[idx:]
 
         # Remove trailing filler
-        s = re.sub(r"\b(just in case|at some point|if possible|not urgent)\b.*$", "", s, flags=re.IGNORECASE).strip()
+        s = re.sub(
+            r"\b(just in case|at some point|if possible|not urgent)\b.*$",
+            "",
+            s,
+            flags=re.IGNORECASE,
+        ).strip()
 
         # Basic normalization
         s_low = s.lower()
@@ -264,7 +288,9 @@ class MockModel:
             if not key:
                 continue
             # Keep the higher-confidence one deterministically
-            if key not in seen or float(t.get("confidence", 0.0)) > float(seen[key].get("confidence", 0.0)):
+            if key not in seen or float(t.get("confidence", 0.0)) > float(
+                seen[key].get("confidence", 0.0)
+            ):
                 seen[key] = t
         # Stable output ordering: by title
         return [seen[k] for k in sorted(seen.keys())]

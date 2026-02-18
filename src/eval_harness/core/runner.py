@@ -5,12 +5,14 @@ import os
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, Tuple
+from typing import Any
 
+from eval_harness.adapters.base import ModelAdapter
 from eval_harness.adapters.mock import MockModel
 from eval_harness.adapters.openai_v1 import OpenAIV1Model
 from eval_harness.core.dataset import load_jsonl
 from eval_harness.core.metrics import exact_match, f1_for_titles
+from eval_harness.core.report_types import EvalReport, ReportResultRow, ReportSummary
 from eval_harness.core.schemas import load_schema, validate_or_errors
 
 
@@ -25,7 +27,7 @@ def _require_env(name: str) -> str:
     return v
 
 
-def _build_adapter(adapter_name: str):
+def _build_adapter(adapter_name: str) -> ModelAdapter:
     """
     Adapter factory.
 
@@ -78,7 +80,7 @@ def run_eval(
     schema_path: str,
     adapter_name: str = "mock",
     out_dir: str = "reports",
-) -> Tuple[str, Dict[str, Any]]:
+) -> tuple[str, ReportSummary]:
     """
     Run an evaluation over a JSONL dataset using a prompt + JSON schema.
 
@@ -97,7 +99,7 @@ def run_eval(
     run_id = f"run-{uuid.uuid4().hex[:8]}"
     started_at_utc = _now_utc_iso()
 
-    results: list[dict] = []
+    results: list[ReportResultRow] = []
     parse_error_count = 0
 
     for c in cases:
@@ -128,7 +130,7 @@ def run_eval(
     total = len(results)
     denom = total if total > 0 else 1
 
-    summary: Dict[str, Any] = {
+    summary: ReportSummary = {
         "run_id": run_id,
         "started_at_utc": started_at_utc,
         "adapter": adapter_name,
@@ -140,7 +142,7 @@ def run_eval(
         "parse_error_count": parse_error_count,
     }
 
-    report = {
+    report: EvalReport = {
         "meta": {
             "run_id": run_id,
             "started_at_utc": started_at_utc,

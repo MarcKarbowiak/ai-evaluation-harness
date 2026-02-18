@@ -1,6 +1,0 @@
-Metadata-Version: 2.4
-Name: ai-evaluation-harness
-Version: 0.1.0
-Requires-Python: >=3.11
-Requires-Dist: jsonschema>=4.22.0
-Requires-Dist: openai>=1.0.0
