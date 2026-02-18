@@ -30,6 +30,10 @@ jobs:
         run: |
           python -m ruff format --check .
 
+      - name: Pyright (type check)
+        run: |
+          python -m pyright
+
       - name: Unit tests
         run: |
           python -m pytest -q

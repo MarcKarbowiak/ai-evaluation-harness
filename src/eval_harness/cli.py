@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from collections.abc import Mapping
 from pathlib import Path
 from typing import Any, Optional
 
@@ -33,8 +34,8 @@ def _load_baseline_summary(baseline_path: str) -> dict[str, Any]:
 
 def _check_regression(
     *,
-    baseline: dict[str, Any],
-    current: dict[str, Any],
+    baseline: Mapping[str, Any],
+    current: Mapping[str, Any],
     max_schema_valid_drop: Optional[float],
     max_exact_match_drop: Optional[float],
     max_avg_f1_drop: Optional[float],
@@ -45,7 +46,7 @@ def _check_regression(
     """
     failures: list[str] = []
 
-    def getf(d: dict[str, Any], key: str) -> float:
+    def getf(d: Mapping[str, Any], key: str) -> float:
         try:
             return float(d.get(key, 0.0))
         except Exception:

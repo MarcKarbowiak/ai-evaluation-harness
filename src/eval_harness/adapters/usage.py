@@ -27,9 +27,10 @@ def _to_jsonable(value: Any) -> Any:
     if isinstance(value, Sequence) and not isinstance(value, (str, bytes, bytearray)):
         return [_to_jsonable(v) for v in value]
 
-    if hasattr(value, "model_dump"):
+    model_dump = getattr(value, "model_dump", None)
+    if callable(model_dump):
         try:
-            return _to_jsonable(value.model_dump())
+            return _to_jsonable(model_dump())
         except Exception:
             pass
 

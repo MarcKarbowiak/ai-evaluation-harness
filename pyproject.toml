@@ -15,6 +15,7 @@ dependencies = [
 dev = [
   "pytest>=8",
   "ruff>=0.9",
+  "pyright>=1.1.350",
 ]
 
 [tool.ruff]
@@ -29,6 +30,13 @@ ignore = ["E501"]
 
 [tool.ruff.format]
 line-ending = "lf"
+
+[tool.pyright]
+include = ["src", "tests"]
+exclude = [".venv", "reports", "datasets", "baselines", "src/ai_evaluation_harness.egg-info"]
+pythonVersion = "3.11"
+typeCheckingMode = "basic"
+reportMissingTypeStubs = false
 
 [project.scripts]
 eval-harness = "eval_harness.cli:main"
