@@ -1,0 +1,23 @@
+# Normalize line endings across platforms.
+#
+# - Code/config/docs: LF in working tree and repo
+# - Windows scripts: CRLF in working tree and repo
+
+# Default: let Git handle text normalization
+* text=auto
+
+# Code
+*.py text eol=lf
+
+# Config / docs
+*.toml text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.md text eol=lf
+*.json text eol=lf
+*.jsonl text eol=lf
+
+# Windows scripts
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+*.cmd text eol=crlf
